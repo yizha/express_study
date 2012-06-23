@@ -26,3 +26,12 @@ exports.movies = function(req, res) {
         res.end(JSON.stringify(movies));
     });
 }
+
+exports.movie = function(req, res) {
+    var hash = req.param('hash');
+    manager.loadMovie(function(reply) {
+        var movie = reply['movie'];
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(movies));
+    });
+}
