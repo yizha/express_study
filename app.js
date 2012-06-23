@@ -1,8 +1,10 @@
 var manager = require('movie_manager');
 
+var movie_dir = ['/tmp/dingyc1', '/tmp/dingyc2'];
+
 manager.connect(null, null, null);
-manager.loadMovieFromDir(['/tmp/dingyc1', '/tmp/dingyc2']);
-manager.watch(['/tmp/dingyc1', '/tmp/dingyc2']);
+manager.loadMovieFromDir(movie_dir);
+manager.watch(movie_dir);
 
 /**
  * Module dependencies.
@@ -41,6 +43,7 @@ app.configure('development', function(){
 
 // Routes
 app.get('/', routes.index);
+app.get('/ajax/movies', routes.ajax_movies);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

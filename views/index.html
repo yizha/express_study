@@ -14,7 +14,7 @@ function auto_reload() {
     <h1>{{ title }}</h1>
     <ul>
         {% for m in movies %}
-        <li id='{{ m.hash }}'>{{ m.filename }}</li>
+        <li>{{ m.filename }}</li>
         {% endfor %}
     </ul>
 </body>
