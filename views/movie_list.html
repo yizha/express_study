@@ -9,11 +9,16 @@
 }*/
 var list_type = '{{ type }}';
 function reload_movies(type) {
-    $.getJSON('/json/movies?type=' + type, function(data) {
+    $.getJSON('/json/movie_list?type=' + type, function(data) {
         if (data && data.length) {
             var html = "";
             for (var i = 0; i < data.length; i++) {
-                html += "<li>" + data[i].filename + "</li>";
+                var movie = data[i];
+                if (movie.available == "true") {
+                    html += "<li>" + data[i].filename + "</li>";
+                } else {
+                    html += "<li><strike>" + data[i].filename + "</strike></li>";
+                }
             }
             var container = $("#movie_list_ul");
             container.empty();
@@ -30,7 +35,7 @@ function auto_reload() {
 </head>
 
 <body onload="javascript:auto_reload();">
-    <h1>{{ title }}</h1>
+    <h1>{{ title }} ({{ type }})</h1>
     <ul id="movie_list_ul">
         {% for m in movies %}
         <li>{{ m.filename }}</li>
