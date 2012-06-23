@@ -29,8 +29,8 @@ app.configure(function(){
   });
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.static(__dirname + '/public'));
   app.use(app.router);
+  app.use("/resources", express.static(__dirname + '/public'));
 });
 
 app.configure('production', function(){
@@ -43,7 +43,7 @@ app.configure('development', function(){
 
 // Routes
 app.get('/', routes.index);
-app.get('/ajax/movies', routes.ajax_movies);
+app.get('/json/movies', routes.movies);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

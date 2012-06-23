@@ -1,0 +1,41 @@
+<html>
+
+<head>
+<script src="/resources/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+/*function auto_reload() {
+    window.location.reload(); 
+    setTimeout(auto_reload, 5000);
+}*/
+var list_type = '{{ type }}';
+function reload_movies(type) {
+    $.getJSON('/json/movies?type=' + type, function(data) {
+        if (data && data.length) {
+            var html = "";
+            for (var i = 0; i < data.length; i++) {
+                html += "<li>" + data[i].filename + "</li>";
+            }
+            var container = $("#movie_list_ul");
+            container.empty();
+            container.append(html);
+        }
+    });
+}
+
+function auto_reload() {
+    reload_movies(list_type);
+    setTimeout(auto_reload, 5000);
+}
+</script>
+</head>
+
+<body onload="javascript:auto_reload();">
+    <h1>{{ title }}</h1>
+    <ul id="movie_list_ul">
+        {% for m in movies %}
+        <li>{{ m.filename }}</li>
+        {% endfor %}
+    </ul>
+    <input type=button onclick="javascript:reload_movies(list_type);" value="reload"/>
+</body>
+</html>
