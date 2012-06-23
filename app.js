@@ -1,29 +1,8 @@
-var dir_to_list = "/tmp";
-var file_to_write = "./views/files.html";
+var manager = require('movie_manager');
 
-var fs = require('fs');
-
-var func = function() {
-    files = fs.readdirSync(dir_to_list);
-    var content = ""; 
-    if (files && files.length) {
-        content += "<table>";
-        for (var i = 0; i < files.length; i++) {
-            content += "<tr><td>" + files[i] + "</td></tr>";
-        }   
-        content += "</table>";
-    } else {
-        content = "<p>no files?</p>";
-    }   
-    target = file_to_write + ".tmp";
-    fs.writeFileSync(target, content, "utf8");
-    fs.renameSync(target, file_to_write);
-    setTimeout(func, 5000);
-}
-
-setTimeout(func, 5000);
-
-
+manager.connect(null, null, null);
+manager.loadMovieFromDir(['/tmp/dingyc1', '/tmp/dingyc2']);
+manager.watch(['/tmp/dingyc1', '/tmp/dingyc2']);
 
 /**
  * Module dependencies.
@@ -44,13 +23,12 @@ app.configure(function(){
   app.set('view options', { layout: false });
   swig.init({
       root: __dirname + '/views',
-      allowErrors: true,
-      autoescape: false
+      allowErrors: true
   });
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+  app.use(app.router);
 });
 
 app.configure('production', function(){
@@ -62,7 +40,6 @@ app.configure('development', function(){
 });
 
 // Routes
-
 app.get('/', routes.index);
 
 app.listen(3000, function(){

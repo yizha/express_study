@@ -9,8 +9,13 @@ function auto_reload() {
 </script>
 </head>
 
-<body onload="javascript:setTimeout(auto_reload, 5000);">
+<!-- <body onload="javascript:setTimeout(auto_reload, 5000);"> -->
+<body>
     <h1>{{ title }}</h1>
-    {{ files|raw }}
+    <ul>
+        {% for m in movies %}
+        <li id='{{ m.hash }}'>{{ m.filename }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

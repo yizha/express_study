@@ -1,12 +1,17 @@
+var manager = require("movie_manager");
 
-/*
- * GET home page.
- */
-
-exports.index = function(req, res){
-//    console.log(require('fs').readFileSync(__dirname + '/../views/files.html', 'utf8'));
-    res.render('index.html', { 
-        title: 'Express', 
-        files: require('fs').readFileSync(__dirname + '/../views/files.html', 'utf8')
+// home page
+exports.index = function(req, res) {
+    manager.listAvailableMovies(function(err, movies) {
+        if (err) {
+            movies = [];
+        }
+        movies.sort(function(a, b) {
+            return a.filename.localeCompare(b.filename);
+        });
+        res.render('index.html', {
+            'title': 'Movies',
+            'movies': movies
+        });
     });
 };
