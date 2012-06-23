@@ -3,10 +3,6 @@
 <head>
 <script src="/resources/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript">
-/*function auto_reload() {
-    window.location.reload(); 
-    setTimeout(auto_reload, 5000);
-}*/
 var list_type = '{{ type }}';
 function reload_movies(type) {
     $.getJSON('/json/movie_list?type=' + type, function(data) {
@@ -36,11 +32,7 @@ function auto_reload() {
 
 <body onload="javascript:auto_reload();">
     <h1>{{ title }} ({{ type }})</h1>
-    <ul id="movie_list_ul">
-        {% for m in movies %}
-        <li>{{ m.filename }}</li>
-        {% endfor %}
-    </ul>
+    <ul id="movie_list_ul"></ul>
     <input type=button onclick="javascript:reload_movies(list_type);" value="reload"/>
 </body>
 </html>
