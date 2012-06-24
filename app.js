@@ -43,6 +43,7 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
 //app.get('/json/movie', routes.movie);
+app.get('/admin', routes.admin);
 app.get('/admin/update_imdb_info', routes.updateIMDBInfo);
 app.get('/admin/update_content_info', routes.updateContentInfo);
 

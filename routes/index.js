@@ -11,6 +11,16 @@ exports.index = function(req, res) {
     });
 }
 
+// admin page
+exports.admin = function(req, res) {
+    var type = req.param('type', 'available');
+    res.render('admin.html', {
+        'type': type,
+        'title': 'Admin',
+        'movies': []
+    });
+}
+
 exports.movies = function(req, res) {
     var type = req.param('type', 'available');
     var funcName = null;

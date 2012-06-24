@@ -1,0 +1,63 @@
+<html>
+
+<head>
+<script src="/resources/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+var list_type = '{{ type }}';
+function reload_movies(type) {
+    $.getJSON('/json/movie_list?type=' + type, function(data) {
+        if (data && data.length) {
+            var html = "";
+            for (var i = 0; i < data.length; i++) {
+                var movie = data[i];
+                var forceCB = '<td><input type=checkbox value=true id=check_' + movie.hash + ' />force</td>';
+                var imdbBtn = '<td><input type=button value=\'load imdb\' onclick="load_imdb(\'' + movie.hash + '\')" /></td>';
+                var contentBtn = '<td><input type=button value=\'load content\' onclick="load_content(\'' + movie.hash + '\')" /></td>';
+                var item = null;
+                if (movie.available == "true") {
+                    item = "<td><span id=" + movie.hash + ">" + movie.filename + "</span></td>";
+                } else {
+                    item = "<td><span id=" + movie.hash + "><strike>" + movie.filename + "</strike></span></td>";
+                }
+                html += "<tr>" + item + forceCB + imdbBtn + contentBtn + "</tr>";
+            }
+            var container = $("#movie_list_table");
+            container.empty();
+            container.append(html);
+        }
+    });
+}
+
+function load_imdb(hash) {
+    var title = $('#' + hash).text();
+    title = window.prompt('Set title to search against www.imdbapi.com:', title);
+    var force = $('#check_' + hash).prop('checked');
+    update_imdb_info(hash, title, force);
+}
+
+function load_content(hash) {
+    var force = $('#check_' + hash).prop('checked');
+    update_content_info(hash, force);
+}
+
+function update_imdb_info(hash, title, force) {
+    var url = '/admin/update_imdb_info?hash=' + hash;
+    url += '&title=' + escape(title);
+    url += '&force=' + force;
+    $.getJSON(url, function(data) {alert('Done');});
+}
+
+function update_content_info(hash, force) {
+    var url = '/admin/update_content_info?hash=' + hash;
+    url += '&force=' + force;
+    $.getJSON(url, function(data) {alert('Done');});
+}
+</script>
+</head>
+
+<body onload="javascript:reload_movies(list_type);">
+    <h1>{{ title }} ({{ type }})</h1>
+    <input type=button onclick="javascript:reload_movies(list_type);" value="reload"/>
+    <table id="movie_list_table"></table>
+</body>
+</html>

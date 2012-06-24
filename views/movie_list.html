@@ -9,30 +9,81 @@ function reload_movies(type) {
         if (data && data.length) {
             var html = "";
             for (var i = 0; i < data.length; i++) {
-                var movie = data[i];
-                if (movie.available == "true") {
-                    html += "<li>" + data[i].filename + "</li>";
-                } else {
-                    html += "<li><strike>" + data[i].filename + "</strike></li>";
-                }
+                html += to_movie_tr(data[i]);
             }
-            var container = $("#movie_list_ul");
+            var container = $("#movie_list_table");
             container.empty();
             container.append(html);
         }
     });
 }
 
+function to_movie_tr(m) {
+    // line start
+    var html = "<tr>";
+    // column 1: poster
+    html += "<td valign=top>";
+    if (m.poster_image) {
+        var imgSrc = '/resources/poster/' + m.poster_image;
+        html += '<a href="' + imgSrc + '" target=_blank><image src="' + imgSrc + '" width=200px height=300px /></a>';
+    } else {
+        html += "No Poster";
+    }
+    html += "</td>";
+    // column 2
+    html += "<td valign=top>";
+    if (m.available == 'false') html += "<font color='red'>Movie file(s) removed</font><br/>";
+    html += to_info_table(m);
+    html += "</td>";
+    // line end
+    html += "</tr>";
+
+    return html;
+}
+
+function to_info_table(m) {
+    var html = "<table>";
+    html += "<tr><td valign=top colspan=2><font size=4>" + m.filename + "</font></td></tr>";
+    // imdb data
+    var imdb = m.imdb;
+    if (imdb) {
+        html += "<tr><td valign=top>Title:</td><td valign=top>" + _get(imdb.Title) + "</td>";
+        html += "<tr><td valign=top>Released:</td><td valign=top>" + _get(imdb.Released) + "</td>";
+        html += "<tr><td valign=top>Runtime:</td><td valign=top>" + _get(imdb.Runtime) + "</td>";
+        html += "<tr><td valign=top>Genre:</td><td valign=top>" + _get(imdb.Genre) + "</td>";
+        html += "<tr><td valign=top>Director:</td><td valign=top>" + _get(imdb.Director) + "</td>";
+        html += "<tr><td valign=top>Writer:</td><td valign=top>" + _get(imdb.Writer) + "</td>";
+        html += "<tr><td valign=top>Actors:</td><td valign=top>" + _get(imdb.Actors) + "</td>";
+        html += "<tr><td valign=top>Plot:</td><td valign=top>" + _get(imdb.Plot) + "</td>";
+        html += "<tr><td valign=top>Votes:</td><td valign=top>" + _get(imdb.imdbVotes) + "</td>";
+        html += "<tr><td valign=top>Rating:</td><td valign=top>" + _get(imdb.imdbRating) + "</td>";
+    }
+    html += "<tr><td valign=top>Size:</td><td valign=top width=100%>" + _getTotalSize(m.content) + "</td></tr>";
+    html += "</table>"
+    return html;
+}
+
+function _getTotalSize(content) {
+    if (content) {
+        if (content.size) return content.size + ' kb';
+    }
+    return 'N/A';
+}
+
+function _get(str) {
+    if (str) return str;
+    return 'N/A';
+}
+
 function auto_reload() {
     reload_movies(list_type);
-    setTimeout(auto_reload, 5000);
+    setTimeout(auto_reload, 60000);
 }
 </script>
 </head>
 
 <body onload="javascript:auto_reload();">
     <h1>{{ title }} ({{ type }})</h1>
-    <ul id="movie_list_ul"></ul>
-    <input type=button onclick="javascript:reload_movies(list_type);" value="reload"/>
+    <table id="movie_list_table" border=1></table>
 </body>
 </html>
