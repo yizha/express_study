@@ -14,10 +14,12 @@ function reload_movies(type) {
                 var imdbBtn = '<td><input type=button value=\'load imdb\' onclick="load_imdb(\'' + movie.hash + '\')" /></td>';
                 var contentBtn = '<td><input type=button value=\'load content\' onclick="load_content(\'' + movie.hash + '\')" /></td>';
                 var item = null;
+                var imdb = movie.imdb;
+                var imdbMark = '<strong>(IMDB)</strong>';
                 if (movie.available == "true") {
-                    item = "<td><span id=" + movie.hash + ">" + movie.filename + "</span></td>";
+                item = "<td><span id=" + movie.hash + ">" + movie.filename + (imdb?imdbMark:'') + "</span></td>";
                 } else {
-                    item = "<td><span id=" + movie.hash + "><strike>" + movie.filename + "</strike></span></td>";
+                    item = "<td><span id=" + movie.hash + "><strike>" + movie.filename + (imdb?imdbMark:'') + "</strike></span></td>";
                 }
                 html += "<tr>" + item + forceCB + imdbBtn + contentBtn + "</tr>";
             }
