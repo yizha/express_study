@@ -1,6 +1,6 @@
 var manager = require('movie_manager');
 
-var movie_dir = ['/tmp/dingyc1', '/tmp/dingyc2'];
+var movie_dir = ['/tmp/dingyc'];
 
 manager.connect(null, null, null);
 manager.loadMovieFromDir(movie_dir);
@@ -42,7 +42,9 @@ app.configure('development', function(){
 // Routes
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
-app.get('/json/movie', routes.movie);
+//app.get('/json/movie', routes.movie);
+app.get('/admin/update_imdb_info', routes.updateIMDBInfo);
+app.get('/admin/update_content_info', routes.updateContentInfo);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

@@ -1,4 +1,5 @@
 var manager = require("movie_manager");
+var path = require('path');
 
 // home page
 exports.index = function(req, res) {
@@ -34,4 +35,24 @@ exports.movie = function(req, res) {
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(movies));
     });
+}
+
+exports.updateIMDBInfo = function(req, res) {
+    var hash = req.param('hash');
+    var title = req.param('title');
+    var force = req.param('force', 'false').toLowerCase();
+    force = (force == 'true') ? true : false;
+    var image_save_root = path.normalize(path.join(__dirname, '../public/poster'));
+    manager.updateIMDBInfo(hash, title, image_save_root, force);
+    res.setHeader("Content-Type", "application/json");
+    res.end('{"reply": "triggered"}');
+}
+
+exports.updateContentInfo = function(req, res) {
+    var hash = req.param('hash');
+    var force = req.param('force', 'false').toLowerCase();
+    force = (force == 'true') ? true : false;
+    manager.updateContentInfo(hash, force);
+    res.setHeader("Content-Type", "application/json");
+    res.end('{"reply": "triggered"}');
 }
