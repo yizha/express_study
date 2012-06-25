@@ -1,0 +1,246 @@
+<html>
+
+<head>
+<script src="/resources/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+var list_type = '{{ type }}';
+function load_movies(type) {
+    $.getJSON('/json/movie_list?type=' + type, function(data) {
+        if (data && data.length) {
+            var html = "";
+            for (var i = 0; i < data.length; i++) {
+                var m = data[i];
+                html += '<option value="' + m.hash + '">' + m.filename + (m.imdb?'&nbsp;(IMDB)':'') + '</option>';
+            }
+            var container = $("#movie_list");
+            container.empty();
+            container.append(html);
+        }
+    });
+}
+
+function edit_selected() {
+    var hash = $('#movie_list').val();
+    edit_movie(hash);
+}
+
+function edit_movie(hash) {
+    $.getJSON('/json/movie?hash=' + hash, function(movie) {
+        clear_edit_area();
+        init_edit_area(movie);
+    });
+}
+
+function clear_edit_area() {
+    $('#hash').text('');
+    $('#filename').text('');
+    $('#available').text('');
+
+    $('#poster_image').empty();
+    $('#new_poster_url').attr('value', '');
+    $('#new_poster_image').empty();
+
+    $('#imdb').empty();
+    $('#imdb_id').attr('value', '');
+    $('#imdb_title').attr('value', '');
+    $('#imdb_year').attr('value', '');
+    $('#new_imdb').empty();
+
+    $('#files').empty();
+    $('#size').text('');
+}
+
+var regex = new RegExp('^(.*)((18|19|20)[0-9]{2}).*$', 'g');
+function get_title_year(filename) {
+    var match = regex.exec(filename);
+    if (match && match.length && match.length > 2) {
+        var title = match[1].trim();
+        return [title.replace(/\./g,' '), match[2]];
+    } else {
+        return [filename, ''];
+    }
+}
+
+function init_edit_area(m) {
+    $('#hash').text(m.hash);
+    $('#filename').text(m.filename);
+    $('#available').text(m.available);
+
+    var poster = m.poster_image;
+    if (poster && poster.length && poster.length > 0) {
+        $('#poster_image').append('<img width=200px height=300px src="/resources/poster/' + poster +  '" />');
+    } else {
+        $('#poster_image').text('N/A');
+    }
+
+    if (m.imdb) {
+        $('#imdb').append(imdb_to_html(m.imdb));
+    } else {
+        $('#imdb').text('N/A');
+    }
+    var match = get_title_year(m.filename);
+    $('#imdb_title').attr('value', match[0]);
+    $('#imdb_year').attr('value', match[1]);
+
+    if (m.content) {
+        $('#files').append(files_to_html(m.content.files));
+        $('#size').text(m.content.size + 'kb');
+    } else {
+        $('#files').text('N/A');
+        $('#size').text('N/A');
+    }
+}
+
+function files_to_html(files) {
+    var html = '<table>';
+    for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        html += '<tr><td>' + f.file + '</td><td>' + f.size + 'kb</td></tr>';
+    }
+    html += '</table>';
+    return html;
+}
+
+function imdb_to_html(imdb) {
+    var html = "<table>";
+    for (var p in imdb) {
+        html += '<tr><td>' + p + ':</td><td>' + imdb[p] + '</td></tr>';
+    }
+    html += "</table>";
+    return html;
+}
+
+function preview_poster() {
+    var poster_url = $('#new_poster_url').attr('value');
+    if (poster_url.length > 0) {
+        var previewContainer = $('#new_poster_image');
+        previewContainer.empty();
+        previewContainer.append('<img width=200px height=300px src="' + poster_url +  '" />');
+    }
+}
+
+function set_poster() {
+    var hash = $('#hash').text();
+    var poster_url = $('#new_poster_url').attr('value');
+    if (poster_url.length > 0) {
+        var url = '/admin/setPoster?hash=' + hash;
+        url += '&image_url=' + escape(poster_url);
+        $.getJSON(url, function(reply) {
+            edit_movie(hash);
+        });
+    }
+}
+
+function remove_poster() {
+    var hash = $('#hash').text();
+    var url = '/admin/removePoster?hash=' + hash;
+    $.getJSON(url, function(reply) {
+        edit_movie(hash);
+    });
+}
+
+function preview_imdb() {
+    var id = $('#imdb_id').attr('value');
+    var title = $('#imdb_title').attr('value');
+    var year = $('#imdb_year').attr('value');
+    var url = 'http://www.imdbapi.com/?i=' + escape(id) + '&t=' + escape(title) + '&y=' + escape(year);
+    $.getJSON(url, function(data) {
+        $('#new_imdb').empty();
+        $('#new_imdb').append(imdb_to_html(data));
+    });
+}
+
+function set_imdb() {
+    var hash = $('#hash').text();
+    var id = $('#imdb_id').attr('value');
+    var title = $('#imdb_title').attr('value');
+    var year = $('#imdb_year').attr('value');
+    var url = '/admin/setIMDB?hash=' + hash;
+    url += '&i=' + escape(id);
+    url += '&t=' + escape(title);
+    url += '&y=' + escape(year);
+    $.getJSON(url, function(reply) {
+        edit_movie(hash);
+    });
+}
+
+function remove_imdb() {
+    var hash = $('#hash').text();
+    var url = '/admin/removeIMDB?hash=' + hash;
+    $.getJSON(url, function(reply) {
+        edit_movie(hash);
+    });
+}
+
+function load_files_size() {
+    var hash = $('#hash').text();
+    var url = '/admin/loadFilesAndSize?hash=' + hash;
+    $.getJSON(url, function(reply) {
+        edit_movie(hash);
+    });
+}
+</script>
+</head>
+
+<body onload="javascript:load_movies(list_type);">
+
+<div><select id="movie_list" size=20></select></div>
+<div>
+<input type=button value=reload onclick="load_movies(list_type)" />
+<input type=button value=edit onclick="edit_selected()" />
+</div>
+
+<br/>
+
+<div>
+    <table>
+       <tr><td colspan=2><strong>Movie Info</strong></td></tr>
+       <tr><td>hash:</td><td><span id=hash></span></td></tr>
+       <tr><td>filename:</td><td><span id=filename></span></td></tr>
+       <tr><td>available:</td><td><span id=available></span></td></tr>
+   </table>
+   <p></p>
+   <table border=1>
+       <tr><td colspan=2><strong>Poster</strong></td></tr>
+       <tr><td>Current:</td><td><span id=poster_image></span></td></tr>
+       <tr><td>New:<input type=text id=new_poster_url></td><td><span id=new_poster_image></span></td></tr>
+       <tr><td colspan=2>
+               <input type=button value=preview onclick='preview_poster()'>
+               <input type=button value=set onclick='set_poster()'>
+               <input type=button value=remove onclick='remove_poster()'>
+       </td></tr>
+   </table>
+   <p></p>
+   <table border=1>
+       <tr><td colspan=2><strong>IMDB Data</strong></td></tr>
+       <tr><td>Current:</td><td><span id=imdb></span></td></tr>
+       <tr>
+           <td>
+               <table>
+                   <tr><td>ID:</td><td><input type=text id=imdb_id></td></tr>
+                   <tr><td>Title:</td><td><input type=text id=imdb_title></td></tr>
+                   <tr><td>Year:</td><td><input type=text id=imdb_year></td></tr>
+               </table>
+           </td>
+           <td><span id=new_imdb></span></td>
+       </tr>
+       <tr><td colspan=2>
+               <input type=button value=preview onclick='preview_imdb()'>
+               <input type=button value=set onclick='set_imdb()'>
+               <input type=button value=remove onclick='remove_imdb()'>
+       </td></tr> 
+    </table>
+    <p></p>
+    <table border=1>
+       <tr><td colspan=2><strong>Files & Size</strong></td></tr>
+       <tr><td>Files:</td><td><span id=files></span></td></tr>
+       <tr><td>Total Size:</td><td><span id=size></span></td></tr>
+       <tr><td colspan=2>
+               <input type=button value=refresh onclick='load_files_size()'>
+       </td></tr> 
+    </table>
+</div>
+
+</body>
+
+</html>

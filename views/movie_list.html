@@ -71,7 +71,7 @@ function _getTotalSize(content) {
 }
 
 function _get(str) {
-    if (str) return str;
+    if (str && typeof str == 'string' && str.length > 0) return str;
     return 'N/A';
 }
 

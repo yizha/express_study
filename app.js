@@ -42,10 +42,19 @@ app.configure('development', function(){
 // Routes
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
+app.get('/json/movie', routes.movie);
 //app.get('/json/movie', routes.movie);
 app.get('/admin', routes.admin);
-app.get('/admin/update_imdb_info', routes.updateIMDBInfo);
-app.get('/admin/update_content_info', routes.updateContentInfo);
+
+app.get('/admin2', routes.admin2);
+app.get('/admin/setPoster', routes.setPoster);
+app.get('/admin/removePoster', routes.removePoster);
+app.get('/admin/setIMDB', routes.setIMDB);
+app.get('/admin/removeIMDB', routes.removeIMDB);
+app.get('/admin/loadFilesAndSize', routes.loadFilesAndSize);
+//app.get('/admin/updateIMDB', routes.updateIMDBInfo);
+//app.get('/admin/update_imdb_info', routes.updateIMDBInfo);
+//app.get('/admin/update_content_info', routes.updateContentInfo);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

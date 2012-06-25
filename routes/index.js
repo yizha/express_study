@@ -21,6 +21,14 @@ exports.admin = function(req, res) {
     });
 }
 
+exports.admin2 = function(req, res) {
+    var type = req.param('type', 'available');
+    res.render('admin2.html', {
+        'type': type,
+        'movies': []
+    });
+}
+
 exports.movies = function(req, res) {
     var type = req.param('type', 'available');
     var funcName = null;
@@ -40,29 +48,74 @@ exports.movies = function(req, res) {
 
 exports.movie = function(req, res) {
     var hash = req.param('hash');
-    manager.loadMovie(function(reply) {
-        var movie = reply['movie'];
+    manager.loadMovie(hash, function(data) {
+        var m = data['movie'];
         res.setHeader("Content-Type", "application/json");
-        res.end(JSON.stringify(movies));
+        res.end(JSON.stringify(m));
     });
 }
 
-exports.updateIMDBInfo = function(req, res) {
+exports.setPoster = function(req, res) {
     var hash = req.param('hash');
-    var title = req.param('title');
-    var force = req.param('force', 'false').toLowerCase();
-    force = (force == 'true') ? true : false;
+    var imageUrl = req.param('image_url');
     var image_save_root = path.normalize(path.join(__dirname, '../public/poster'));
-    manager.updateIMDBInfo(hash, title, image_save_root, force);
-    res.setHeader("Content-Type", "application/json");
-    res.end('{"reply": "triggered"}');
+    var savepath = path.join(image_save_root, hash + path.extname(imageUrl));
+    manager.downloadPoster(hash, imageUrl, savepath, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
 }
 
-exports.updateContentInfo = function(req, res) {
+exports.removePoster = function(req, res) {
     var hash = req.param('hash');
-    var force = req.param('force', 'false').toLowerCase();
-    force = (force == 'true') ? true : false;
-    manager.updateContentInfo(hash, force);
+    manager.removeField(hash, 'poster_image', function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
+}
+/*
+exports.setIMDB = function(req, res) {
+    var hash = req.param('hash');
+    var imdb = req.param('imdb');
     res.setHeader("Content-Type", "application/json");
-    res.end('{"reply": "triggered"}');
+    manager.setField(hash, 'imdb', imdb, function(reply) {
+        if (reply && reply.success == 'true') {
+            var poster_url = imdb.Poster;
+            var image_save_root = path.normalize(path.join(__dirname, '../public/poster'));
+            var savepath = path.join(image_save_root, hash + path.extname(poster_url));
+            manager.downloadPoster(hash, poster_url, savepath, function(r) {
+                res.end(JSON.stringify(reply));
+            });
+        } else {
+            res.end(JSON.stringify(reply));
+        }
+    });
+}
+*/
+exports.removeIMDB = function(req, res) {
+    var hash = req.param('hash');
+    manager.removeField(hash, 'imdb', function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
+}
+
+exports.setIMDB = function(req, res) {
+    var hash = req.param('hash');
+    var id = req.param('i');
+    var title = req.param('t');
+    var year = req.param('y');
+    var image_save_root = path.normalize(path.join(__dirname, '../public/poster'));
+    manager.setIMDB(hash, {'i': id, 't': title, 'y': year}, image_save_root, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
+}
+
+exports.loadFilesAndSize = function(req, res) {
+    var hash = req.param('hash');
+    manager.loadFilesAndSize(hash, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
 }
