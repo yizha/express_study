@@ -39,10 +39,16 @@ app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
+function auth(user, pass) {
+    return user == 'yizha' && pass == 'firstnodejsapp';
+}
+
 // Routes
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
 app.get('/json/movie', routes.movie);
+
+app.get('/admin*', express.basicAuth(auth));
 
 app.get('/admin', routes.admin);
 app.get('/admin/setPoster', routes.setPoster);
