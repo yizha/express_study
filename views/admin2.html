@@ -68,7 +68,8 @@ function init_edit_area(m) {
 
     var poster = m.poster_image;
     if (poster && poster.length && poster.length > 0) {
-        $('#poster_image').append('<img width=200px height=300px src="/resources/poster/' + poster +  '" />');
+        $('#poster_image').append('<img width=200px height=300px src="/resources/poster/' + m.hash +  '.jpg" />');
+        $('#new_poster_url').attr('value', poster);
     } else {
         $('#poster_image').text('N/A');
     }

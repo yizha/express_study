@@ -24,7 +24,7 @@ function to_movie_tr(m) {
     // column 1: poster
     html += "<td valign=top>";
     if (m.poster_image) {
-        var imgSrc = '/resources/poster/' + m.poster_image;
+        var imgSrc = '/resources/poster/' + m.hash + '.jpg';
         html += '<a href="' + imgSrc + '" target=_blank><image src="' + imgSrc + '" width=200px height=300px /></a>';
     } else {
         html += "N/A";
