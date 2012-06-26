@@ -43,10 +43,8 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
 app.get('/json/movie', routes.movie);
-//app.get('/json/movie', routes.movie);
-app.get('/admin', routes.admin);
 
-app.get('/admin2', routes.admin2);
+app.get('/admin', routes.admin);
 app.get('/admin/setPoster', routes.setPoster);
 app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);

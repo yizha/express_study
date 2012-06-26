@@ -16,15 +16,6 @@ exports.admin = function(req, res) {
     var type = req.param('type', 'available');
     res.render('admin.html', {
         'type': type,
-        'title': 'Admin',
-        'movies': []
-    });
-}
-
-exports.admin2 = function(req, res) {
-    var type = req.param('type', 'available');
-    res.render('admin2.html', {
-        'type': type,
         'movies': []
     });
 }
