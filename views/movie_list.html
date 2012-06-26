@@ -58,8 +58,34 @@ function to_info_table(m) {
         html += "<tr><td valign=top>Votes:</td><td valign=top>" + _get(imdb.imdbVotes) + "</td>";
         html += "<tr><td valign=top>Rating:</td><td valign=top>" + _get(imdb.imdbRating) + "</td>";
     }
-    html += "<tr><td valign=top>Size:</td><td valign=top width=100%>" + _getTotalSize(m.content) + "</td></tr>";
+    if (m.content && m.content.files && m.content.files.length > 0) {
+        html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td><td valign=top width=100%>' + _getTotalSize(m.content) + "</td></tr>";
+        html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
+    } else {
+        html += "<tr><td valign=top>Size:</td><td valign=top width=100%>" + _getTotalSize(m.content) + "</td></tr>";
+    }
     html += "</table>"
+    return html;
+}
+
+function toggle_files(id) {
+    var target = $('#' + id);
+    var curDisplay = target.css('display');
+    if (curDisplay == 'none') {
+        target.css('display', '');
+    } else {
+        target.css('display', 'none');
+    }
+}
+
+function files_to_html(files) {
+    var html = '<table>';
+    if (files && files.length > 0) {
+        for (var i = 0; i < files.length; i++) {
+            html += '<tr><td>' + files[i]['file'] + '</td><td>' + files[i]['size'] + 'kb</td></tr>';
+        }
+    }
+    html += '</table>';
     return html;
 }
 
