@@ -39,16 +39,22 @@ app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-function auth(user, pass) {
+function userAuth(user, pass) {
+    return user == 'media' && pass == 'wearethebest';
+}
+
+function adminAuth(user, pass) {
     return user == 'yizha' && pass == 'firstnodejsapp';
 }
 
 // Routes
+app.get('/', express.basicAuth(userAuth));
+
 app.get('/', routes.index);
 app.get('/json/movie_list', routes.movies);
 app.get('/json/movie', routes.movie);
 
-app.get('/admin*', express.basicAuth(auth));
+app.get('/admin*', express.basicAuth(adminAuth));
 
 app.get('/admin', routes.admin);
 app.get('/admin/setPoster', routes.setPoster);
@@ -56,9 +62,6 @@ app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);
 app.get('/admin/removeIMDB', routes.removeIMDB);
 app.get('/admin/loadFilesAndSize', routes.loadFilesAndSize);
-//app.get('/admin/updateIMDB', routes.updateIMDBInfo);
-//app.get('/admin/update_imdb_info', routes.updateIMDBInfo);
-//app.get('/admin/update_content_info', routes.updateContentInfo);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
