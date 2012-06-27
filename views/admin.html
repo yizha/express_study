@@ -35,6 +35,9 @@ function clear_edit_area() {
     $('#hash').text('');
     $('#filename').text('');
     $('#available').text('');
+    $('#recommend_checkbox').prop('checked', false);
+    $('#recommend_checkbox').prop('disabled', true);
+    $('#recommend_label').prop('disabled', true);
     $('#movie_users_link').css('display', 'none');
 
     $('#poster_image').empty();
@@ -66,6 +69,10 @@ function init_edit_area(m) {
     $('#hash').text(m.hash);
     $('#filename').text(m.filename);
     $('#available').text(m.available);
+    var recommend = (m.recommend == '1' ? true : false);
+    $('#recommend_checkbox').prop('checked', recommend);
+    $('#recommend_checkbox').prop('disabled', false);
+    $('#recommend_label').prop('disabled', false);
     $('#movie_users_link').attr('href', '/movie_users?hash=' + m.hash);
     $('#movie_users_link').css('display', '');
 
@@ -112,6 +119,13 @@ function imdb_to_html(imdb) {
     }
     html += "</table>";
     return html;
+}
+
+function recommend(checked) {
+    var hash = $('#hash').text();
+    var url = '/admin/recommend?hash=' + hash;
+    url += '&action=' + (checked ? 'set' : 'remove');
+    $.getJSON(url, function(reply) {});
 }
 
 function preview_poster() {
@@ -208,6 +222,7 @@ function load_files_size() {
        <tr><td>hash:</td><td><span id=hash></span></td></tr>
        <tr><td>filename:</td><td><span id=filename></span></td></tr>
        <tr><td>available:</td><td><span id=available></span></td></tr>
+       <tr><td colspan=2><input type=checkbox id='recommend_checkbox' disabled onclick='recommend(this.checked)'><label id='recommend_label' for='recommend_checkbox'>Recommend</label></td></tr>
        <tr><td colspan=2><a style='display: none' id='movie_users_link' href='#' target='_blank'>Users Marked This Movie</a></td></tr>
    </table>
    <p></p>

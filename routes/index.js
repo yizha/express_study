@@ -11,6 +11,7 @@ exports.index = function(req, res) {
     });
 }
 
+// all users page
 exports.allUsers = function(req, res) {
     manager.allUsers(function(reply) {
         res.render('all_users.html', {
@@ -19,6 +20,7 @@ exports.allUsers = function(req, res) {
     });
 }
 
+// user movies page
 exports.userMovies = function(req, res) {
     var user = req.param('user');
     manager.loadUserMovies(user, function(reply) {
@@ -31,6 +33,7 @@ exports.userMovies = function(req, res) {
     });
 }
 
+// movie users page
 exports.movieUsers = function(req, res) {
     var hash = req.param('hash');
     manager.loadMovieUsers(hash, function(reply) {
@@ -41,13 +44,27 @@ exports.movieUsers = function(req, res) {
     });
 }
 
-
 // admin page
 exports.admin = function(req, res) {
     var type = req.param('type', 'available');
     res.render('admin.html', {
         'type': type,
         'movies': []
+    });
+}
+
+exports.recommendMovie = function(req, res) {
+    var hash = req.param('hash');
+    var action = req.param('action', '');
+    var value = null;
+    if (action.toLowerCase() == 'set') {
+        value = '1';
+    } else {
+        value = '0';
+    }
+    manager.setField(hash, 'recommend', value, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
     });
 }
 

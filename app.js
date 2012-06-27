@@ -68,6 +68,7 @@ app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);
 app.get('/admin/removeIMDB', routes.removeIMDB);
 app.get('/admin/loadFilesAndSize', routes.loadFilesAndSize);
+app.get('/admin/recommend', routes.recommendMovie);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

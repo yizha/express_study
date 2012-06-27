@@ -1,6 +1,7 @@
 <html>
 
 <head>
+<link href='/resources/css/recommend.css' rel='stylesheet' type='text/css' />
 <script src="/resources/js/jquery-1.7.2.min.js"></script>
 <script src="/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
@@ -33,7 +34,11 @@ function to_movie_tr(m) {
     }
     html += "</td>";
     // column 2
-    html += '<td valign=top>';
+    if (m.recommend == '1') {
+        html += '<td valign=top class=recommend>';
+    } else {
+        html += '<td valign=top>';
+    }
     if (m.available == 'false') html += "<font color='red'>REMOVED</font><br/>";
     html += to_info_table(m);
     html += "</td>";
@@ -63,12 +68,12 @@ function to_info_table(m) {
     if (m.content && m.content.files && m.content.files.length > 0) {
         html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')">mark</span></td></tr>';
+            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
         html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
     } else {
         html += '<tr><td valign=top>Size:</td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')">mark</span></td></tr>';
+            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
     }
     html += "</table>"
     return html;
