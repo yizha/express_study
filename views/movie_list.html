@@ -15,6 +15,7 @@ function reload_movies(type) {
             var container = $("#movie_list_table");
             container.empty();
             container.append(html);
+            auto_login();
         }
     });
 }
@@ -32,7 +33,7 @@ function to_movie_tr(m) {
     }
     html += "</td>";
     // column 2
-    html += "<td valign=top>";
+    html += '<td valign=top>';
     if (m.available == 'false') html += "<font color='red'>REMOVED</font><br/>";
     html += to_info_table(m);
     html += "</td>";
@@ -62,72 +63,83 @@ function to_info_table(m) {
     if (m.content && m.content.files && m.content.files.length > 0) {
         html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><span id=mark_text_' + m.hash + '>mark</span></td></tr>';
+            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')">mark</span></td></tr>';
         html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
     } else {
         html += '<tr><td valign=top>Size:</td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><span id=mark_text_' + m.hash + '>mark</span></td></tr>';
+            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')">mark</span></td></tr>';
     }
     html += "</table>"
     return html;
 }
 
 var movie_user = $.cookie('movie_user');
-function set_welcome_msg(user) {
-    if (verifyUser(user)) {
-        $('#movie_user').text('Welcome "' + user + '".');
-    } else {
-        $('#movie_user').text('');
-    }
-}
 
-function getUser() {
+function perform_login() {
     var user = movie_user;
-    if (user && typeof user === 'string' && user.length > 0) {
-        return user;
-    } else {
-        var user = null;
-        while (user == null) {
-            user = verifyUser(window.prompt('Tell me who you are, '
-                        + 'better use a recognizable name, or who knows what will happen:', ''));
-        }
-        movie_user = user;
-        $.cookie('movie_user', user, { expires: 3650, path: '/' });
-        set_welcome_msg(user);
-        set_movie_marks();
-        return user;
+    $('#login_link').css('display', 'none');
+    set_welcome_msg(user);
+    set_movie_marks();
+    show_all_marks();
+}
+
+function auto_login() {
+    if (movie_user && typeof movie_user === 'string' && movie_user.length > 0) {
+         perform_login();
     }
 }
 
-function verifyUser(input) {
-    if (input && typeof input === 'string' && input.trim().length > 0) {
-        return input.trim();
-    } else {
-        return null;
+function login() {
+    while (true) {
+        user = window.prompt('Just tell me who you are, '
+                    + 'better use a recognizable name, like "dingyc":', '');
+        if (user == null) { // user choose 'cancel'
+            break;
+        } else if (user.length == 0) { // empty input
+            // keep prompting
+        } else {
+            break;
+        }
     }
+    if (user != null) {
+        $.cookie('movie_user', user, { expires: 3650, path: '/' });
+        movie_user = user;
+        perform_login();
+    }
+}
+
+function set_welcome_msg(user) {
+    var container = $('#movie_user');
+    container.text('Welcome "' + user + '".');
+    container.css('display', '');
 }
 
 function mark(hash) {
-    var user = getUser(); 
-    var checked = $('#mark_' + hash).prop('checked');
-    var url = '/json/mark_movie?user=' + user;
-    url += '&hash=' + hash;
-    url += '&mark=' + checked;
-    $.getJSON(url, function(reply) {/*
-        if (reply && reply.success == true) {
-            if (checked) {
-                $('#mark_text_' + hash).text('unmark');
-            } else {
-                $('#mark_text_' + hash).text('mark');
+    var user = movie_user; 
+    if (user != null && user.length > 0) {
+        var checked = $('#mark_' + hash).prop('checked');
+        var url = '/json/mark_movie?user=' + user;
+        url += '&hash=' + hash;
+        url += '&mark=' + checked;
+        $.getJSON(url, function(reply) {/*
+            if (reply && reply.success == true) {
+                if (checked) {
+                    $('#mark_text_' + hash).text('unmark');
+                } else {
+                    $('#mark_text_' + hash).text('mark');
+                }
             }
-        }
-    */});
+        */});
+    }
+}
+
+function show_all_marks() {
+    $('span[name="mark_container"]').css('display', '');
 }
 
 function set_movie_marks() {
     var user = movie_user;
-    if (!(user && typeof user === 'string' && user.length > 0)) return;
     var url = '/json/user_movies?user=' + user;
     $.getJSON(url, function(reply) {
         var hashes = reply['hashes'];
@@ -175,15 +187,14 @@ function _get(str) {
 
 function auto_reload() {
     reload_movies(list_type);
-    set_movie_marks();
-    setTimeout(auto_reload, 60000);
+    setTimeout(auto_reload, 3600000);
 }
 </script>
 </head>
 
-<body onload="javascript:set_welcome_msg(movie_user);auto_reload();">
-    <h1>{{ title }} ({{ type }})</h1>
-    <span id='movie_user'></span>
-    <table id="movie_list_table" border=1></table>
+<body onload="javascript:auto_reload();">
+    <h1>{{ title }}</h1>
+    <a id="login_link" href="" onclick="login()">Login</a><span id='movie_user' style='display: none'></span>
+    <table id="movie_list_table" border=1 width=100%></table>
 </body>
 </html>
