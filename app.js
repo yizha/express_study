@@ -49,14 +49,20 @@ function adminAuth(user, pass) {
 
 // Routes
 app.get('/', express.basicAuth(userAuth));
-
-app.get('/', routes.index);
-app.get('/json/movie_list', routes.movies);
-app.get('/json/movie', routes.movie);
-
 app.get('/admin*', express.basicAuth(adminAuth));
 
+app.get('/', routes.index);
+app.get('/user_movies', routes.userMovies);
+app.get('/movie_users', routes.movieUsers);
+
+app.get('/json/movie_list', routes.movies);
+app.get('/json/movie', routes.movie);
+app.get('/json/mark_movie', routes.markUserMovie);
+app.get('/json/user_movies', routes.loadUserMovies);
+app.get('/json/movie_users', routes.loadMovieUsers);
+
 app.get('/admin', routes.admin);
+app.get('/admin/all_users', routes.allUsers);
 app.get('/admin/setPoster', routes.setPoster);
 app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);

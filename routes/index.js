@@ -6,10 +6,41 @@ exports.index = function(req, res) {
     var type = req.param('type', 'available');
     res.render('movie_list.html', {
         'type': type,
-        'title': 'Movies',
+        'title': '【麦爸Movie吧】',
         'movies': []
     });
 }
+
+exports.allUsers = function(req, res) {
+    manager.allUsers(function(reply) {
+        res.render('all_users.html', {
+            'users': reply.users
+        });
+    });
+}
+
+exports.userMovies = function(req, res) {
+    var user = req.param('user');
+    manager.loadUserMovies(user, function(reply) {
+        manager.loadMovieFilenames(reply.hashes, function(reply2) {
+            res.render('user_movies.html', {
+                'user': user,
+                'filenames': reply2.filenames
+            });
+        });
+    });
+}
+
+exports.movieUsers = function(req, res) {
+    var hash = req.param('hash');
+    manager.loadMovieUsers(hash, function(reply) {
+            res.render('movie_users.html', {
+                'movieFilename': reply.filename,
+                'users': reply.users
+            });
+    });
+}
+
 
 // admin page
 exports.admin = function(req, res) {
@@ -43,6 +74,32 @@ exports.movie = function(req, res) {
         var m = data['movie'];
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(m));
+    });
+}
+
+exports.markUserMovie = function(req, res) {
+    var hash = req.param('hash');
+    var user = req.param('user');
+    var mark = req.param('mark');
+    manager.markUserMovie(user, hash, mark, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
+}
+
+exports.loadUserMovies = function(req, res) {
+    var user = req.param('user');
+    manager.loadUserMovies(user, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
+    });
+}
+
+exports.loadMovieUsers = function(req, res) {
+    var hash = req.param('hash');
+    manager.loadMovieUsers(hash, function(reply) {
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(reply));
     });
 }
 

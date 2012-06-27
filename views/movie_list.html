@@ -2,6 +2,7 @@
 
 <head>
 <script src="/resources/js/jquery-1.7.2.min.js"></script>
+<script src="/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
 var list_type = '{{ type }}';
 function reload_movies(type) {
@@ -43,29 +44,100 @@ function to_movie_tr(m) {
 
 function to_info_table(m) {
     var html = "<table>";
-    html += "<tr><td valign=top colspan=2><font size=4>" + m.filename + "</font></td></tr>";
+    html += "<tr><td valign=top colspan=3><font size=4>" + m.filename + "</font></td></tr>";
     // imdb data
     var imdb = m.imdb;
     if (imdb) {
-        html += "<tr><td valign=top>Title:</td><td valign=top>" + _get(imdb.Title) + "</td>";
-        html += "<tr><td valign=top>Released:</td><td valign=top>" + _get(imdb.Released) + "</td>";
-        html += "<tr><td valign=top>Runtime:</td><td valign=top>" + _get(imdb.Runtime) + "</td>";
-        html += "<tr><td valign=top>Genre:</td><td valign=top>" + _get(imdb.Genre) + "</td>";
-        html += "<tr><td valign=top>Director:</td><td valign=top>" + _get(imdb.Director) + "</td>";
-        html += "<tr><td valign=top>Writer:</td><td valign=top>" + _get(imdb.Writer) + "</td>";
-        html += "<tr><td valign=top>Actors:</td><td valign=top>" + _get(imdb.Actors) + "</td>";
-        html += "<tr><td valign=top>Plot:</td><td valign=top>" + _get(imdb.Plot) + "</td>";
-        html += "<tr><td valign=top>Votes:</td><td valign=top>" + _get(imdb.imdbVotes) + "</td>";
-        html += "<tr><td valign=top>Rating:</td><td valign=top>" + _get(imdb.imdbRating) + "</td>";
+        html += "<tr><td valign=top>Title:</td><td valign=top colspan=2>" + _get(imdb.Title) + "</td>";
+        html += "<tr><td valign=top>Released:</td><td valign=top colspan=2>" + _get(imdb.Released) + "</td>";
+        html += "<tr><td valign=top>Runtime:</td><td valign=top colspan=2>" + _get(imdb.Runtime) + "</td>";
+        html += "<tr><td valign=top>Genre:</td><td valign=top colspan=2>" + _get(imdb.Genre) + "</td>";
+        html += "<tr><td valign=top>Director:</td><td valign=top colspan=2>" + _get(imdb.Director) + "</td>";
+        html += "<tr><td valign=top>Writer:</td><td valign=top colspan=2>" + _get(imdb.Writer) + "</td>";
+        html += "<tr><td valign=top>Actors:</td><td valign=top colspan=2>" + _get(imdb.Actors) + "</td>";
+        html += "<tr><td valign=top>Plot:</td><td valign=top colspan=2>" + _get(imdb.Plot) + "</td>";
+        html += "<tr><td valign=top>Votes:</td><td valign=top colspan=2>" + _get(imdb.imdbVotes) + "</td>";
+        html += "<tr><td valign=top>Rating:</td><td valign=top colspan=2>" + _get(imdb.imdbRating) + "</td>";
     }
     if (m.content && m.content.files && m.content.files.length > 0) {
-        html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td><td valign=top width=100%>' + _getTotalSize(m.content) + "</td></tr>";
+        html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td>' 
+            + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
+            + '<td align=right style="white-space: nowrap"><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><span id=mark_text_' + m.hash + '>mark</span></td></tr>';
         html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
     } else {
-        html += "<tr><td valign=top>Size:</td><td valign=top width=100%>" + _getTotalSize(m.content) + "</td></tr>";
+        html += '<tr><td valign=top>Size:</td>' 
+            + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
+            + '<td align=right style="white-space: nowrap"><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><span id=mark_text_' + m.hash + '>mark</span></td></tr>';
     }
     html += "</table>"
     return html;
+}
+
+var movie_user = $.cookie('movie_user');
+function set_welcome_msg(user) {
+    if (verifyUser(user)) {
+        $('#movie_user').text('Welcome "' + user + '".');
+    } else {
+        $('#movie_user').text('');
+    }
+}
+
+function getUser() {
+    var user = movie_user;
+    if (user && typeof user === 'string' && user.length > 0) {
+        return user;
+    } else {
+        var user = null;
+        while (user == null) {
+            user = verifyUser(window.prompt('Tell me who you are, '
+                        + 'better use a recognizable name, or who knows what will happen:', ''));
+        }
+        movie_user = user;
+        $.cookie('movie_user', user, { expires: 3650, path: '/' });
+        set_welcome_msg(user);
+        set_movie_marks();
+        return user;
+    }
+}
+
+function verifyUser(input) {
+    if (input && typeof input === 'string' && input.trim().length > 0) {
+        return input.trim();
+    } else {
+        return null;
+    }
+}
+
+function mark(hash) {
+    var user = getUser(); 
+    var checked = $('#mark_' + hash).prop('checked');
+    var url = '/json/mark_movie?user=' + user;
+    url += '&hash=' + hash;
+    url += '&mark=' + checked;
+    $.getJSON(url, function(reply) {/*
+        if (reply && reply.success == true) {
+            if (checked) {
+                $('#mark_text_' + hash).text('unmark');
+            } else {
+                $('#mark_text_' + hash).text('mark');
+            }
+        }
+    */});
+}
+
+function set_movie_marks() {
+    var user = movie_user;
+    if (!(user && typeof user === 'string' && user.length > 0)) return;
+    var url = '/json/user_movies?user=' + user;
+    $.getJSON(url, function(reply) {
+        var hashes = reply['hashes'];
+        if (hashes && hashes instanceof Array && hashes.length > 0) {
+            for (var i = 0; i < hashes.length; i++) {
+                var target = $('#mark_' + hashes[i]);
+                if (target) target.prop('checked', 'true');
+            }
+        }
+    });
 }
 
 function toggle_files(id) {
@@ -97,19 +169,21 @@ function _getTotalSize(content) {
 }
 
 function _get(str) {
-    if (str && typeof str == 'string' && str.length > 0) return str;
+    if (str && typeof str === 'string' && str.length > 0) return str;
     return 'N/A';
 }
 
 function auto_reload() {
     reload_movies(list_type);
+    set_movie_marks();
     setTimeout(auto_reload, 60000);
 }
 </script>
 </head>
 
-<body onload="javascript:auto_reload();">
+<body onload="javascript:set_welcome_msg(movie_user);auto_reload();">
     <h1>{{ title }} ({{ type }})</h1>
+    <span id='movie_user'></span>
     <table id="movie_list_table" border=1></table>
 </body>
 </html>

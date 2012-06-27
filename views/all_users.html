@@ -1,0 +1,13 @@
+<html>
+
+<head></head>
+
+<body>
+    <ul>
+        {% for u in users %}
+        <li><a href='/user_movies?user={{ u }}' target='_blank'>{{ u }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
