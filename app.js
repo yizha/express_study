@@ -48,7 +48,7 @@ function adminAuth(user, pass) {
 }
 
 // Routes
-app.get('/', express.basicAuth(userAuth));
+//app.get('/', express.basicAuth(userAuth));
 app.get('/admin*', express.basicAuth(adminAuth));
 
 app.get('/', routes.index);
