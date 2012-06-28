@@ -1,0 +1,17 @@
+<html>
+
+<head></head>
+
+<body>
+    <h1>All Marked Movies</h1>
+    {% for m in movies %}
+    <h3>{{ m.filename }}</h3>
+    <ul>
+        {% for u in m.users %}
+        <li>{{ u }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</body>
+
+</html>

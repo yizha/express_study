@@ -44,6 +44,15 @@ exports.movieUsers = function(req, res) {
     });
 }
 
+// all marked movies page
+exports.markedMovies = function(req, res) {
+    manager.loadMarkedMovies(function(reply) {
+        res.render('marked_movies.html', {
+            'movies': reply.movies
+        });
+    });
+}
+
 // admin page
 exports.admin = function(req, res) {
     var type = req.param('type', 'available');
