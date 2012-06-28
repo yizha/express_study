@@ -1,0 +1,35 @@
+<html>
+
+    <head>
+        <script src="/resources/js/jquery-1.7.2.min.js"></script>    
+        <script>
+            function toggle_user_movies(user) {
+                var mark = $('#mark_' + user);
+                var movies = $('#movies_' + user);
+                var disp = movies.css('display');
+                if (disp == 'none') {
+                    mark.text('-');
+                    movies.css('display', '');
+                } else {
+                    mark.text('+');
+                    movies.css('display', 'none');
+                }
+            }
+        </script>
+    </head>
+
+<body>
+    <h1>All User Movies</h1>
+    <dl>
+        {% for movies in allUserMovies %}
+        <dt><span id="mark_{{ loop.key }}">+</span>&nbsp;<a href="#" onclick="toggle_user_movies('{{ loop.key  }}')">{{ loop.key }}</a></dt>
+        <ul id="movies_{{ loop.key }}" style="display: none">
+            {% for movieName in {{ movies }} %}
+            <li>{{ movieName }}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </dl>
+</body>
+
+</html>

@@ -20,6 +20,14 @@ exports.allUsers = function(req, res) {
     });
 }
 
+exports.allUserMovies = function(req, res) {
+    manager.loadAllUserMovies(function(reply) {
+        res.render('all_user_movies.html', {
+            'allUserMovies': reply.all_user_movies
+        });
+    });
+}
+
 // user movies page
 exports.userMovies = function(req, res) {
     var user = req.param('user');

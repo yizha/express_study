@@ -63,6 +63,7 @@ app.get('/json/user_movies', routes.loadUserMovies);
 
 app.get('/admin', routes.admin);
 app.get('/admin/all_users', routes.allUsers);
+app.get('/admin/all_user_movies', routes.allUserMovies);
 app.get('/admin/setPoster', routes.setPoster);
 app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);
