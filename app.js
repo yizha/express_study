@@ -53,8 +53,6 @@ app.get('/admin*', express.basicAuth(adminAuth));
 
 app.get('/', routes.index);
 app.get('/user_movies', routes.userMovies);
-app.get('/movie_users', routes.movieUsers);
-app.get('/marked_movies', routes.markedMovies);
 
 app.get('/json/movie_list', routes.movies);
 app.get('/json/movie', routes.movie);
@@ -64,13 +62,14 @@ app.get('/json/user_movies', routes.loadUserMovies);
 app.get('/admin', routes.admin);
 app.get('/admin/all_users', routes.allUsers);
 app.get('/admin/all_user_movies', routes.allUserMovies);
+app.get('/admin/marked_movies', routes.markedMovies);
+app.get('/admin/movie_users', routes.movieUsers);
 app.get('/admin/setPoster', routes.setPoster);
 app.get('/admin/removePoster', routes.removePoster);
 app.get('/admin/setIMDB', routes.setIMDB);
 app.get('/admin/removeIMDB', routes.removeIMDB);
 app.get('/admin/loadFilesAndSize', routes.loadFilesAndSize);
 app.get('/admin/recommend', routes.recommendMovie);
-//app.get('/admin/movie_users', routes.loadMovieUsers);
 
 app.listen(3000, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

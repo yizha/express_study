@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<link href='/resources/css/recommend.css' rel='stylesheet' type='text/css' />
+<link href='/resources/css/movie_list.css' rel='stylesheet' type='text/css' />
 <script src="/resources/js/jquery-1.7.2.min.js"></script>
 <script src="/resources/js/jquery.cookie.js"></script>
 <script type="text/javascript">
@@ -48,32 +48,65 @@ function to_movie_tr(m) {
     return html;
 }
 
+function _get(m, attr) {
+    var imdb = m.imdb;
+    var douban = m.douban;
+    if (douban && typeof douban[attr] === 'string' && douban[attr].length > 0) {
+        return douban[attr];
+    } else if (imdb && typeof imdb[attr] === 'string' && imdb[attr].length > 0) {
+        return imdb[attr];
+    } else {
+        return 'N/A';
+    }
+}
+
+function _getVotesRating(m, type) {
+    var data = m[type];
+    if (data && typeof data === 'object') {
+        return data['Votes'] + '/' + data['Rating'];
+    } else {
+        return 'N/A';
+    }
+}
+
+function _getLinkHtml(m) {
+    var imdb = m.imdb;
+    var douban = m.douban;
+    var html = '&nbsp;(';
+    html += '<a href="' + imdb['url'] + '" target="_movie_ref">IMDB</a>';
+    if (douban && douban['url']) {
+        html += ' / <a href="' + douban['url'] + '" target="_movie_ref">豆瓣</a>';
+    }
+    html += ')';
+    return html;
+}
+
 function to_info_table(m) {
     var html = "<table>";
     html += "<tr><td valign=top colspan=3><font size=4>" + m.filename + "</font></td></tr>";
     // imdb data
     var imdb = m.imdb;
     if (imdb) {
-        html += "<tr><td valign=top>Title:</td><td valign=top colspan=2>" + _get(imdb.Title) + "</td>";
-        html += "<tr><td valign=top>Released:</td><td valign=top colspan=2>" + _get(imdb.Released) + "</td>";
-        html += "<tr><td valign=top>Runtime:</td><td valign=top colspan=2>" + _get(imdb.Runtime) + "</td>";
-        html += "<tr><td valign=top>Genre:</td><td valign=top colspan=2>" + _get(imdb.Genre) + "</td>";
-        html += "<tr><td valign=top>Director:</td><td valign=top colspan=2>" + _get(imdb.Director) + "</td>";
-        html += "<tr><td valign=top>Writer:</td><td valign=top colspan=2>" + _get(imdb.Writer) + "</td>";
-        html += "<tr><td valign=top>Actors:</td><td valign=top colspan=2>" + _get(imdb.Actors) + "</td>";
-        html += "<tr><td valign=top>Plot:</td><td valign=top colspan=2>" + _get(imdb.Plot) + "</td>";
-        html += "<tr><td valign=top>Votes:</td><td valign=top colspan=2>" + _get(imdb.imdbVotes) + "</td>";
-        html += "<tr><td valign=top>Rating:</td><td valign=top colspan=2>" + _get(imdb.imdbRating) + "</td>";
+        html += "<tr><td valign=top class=nowrap>片名:</td><td valign=top colspan=2>" + _get(m, 'Title') + _getLinkHtml(m) + "</td>";
+        html += "<tr><td valign=top class=nowrap>发布日期:</td><td valign=top colspan=2>" + _get(m, 'Released') + "</td>";
+        html += "<tr><td valign=top class=nowrap>时长:</td><td valign=top colspan=2>" + _get(m, 'Runtime') + "</td>";
+        html += "<tr><td valign=top class=nowrap>类型:</td><td valign=top colspan=2>" + _get(m, 'Genre') + "</td>";
+        html += "<tr><td valign=top class=nowrap>导演:</td><td valign=top colspan=2>" + _get(m, 'Director') + "</td>";
+        html += "<tr><td valign=top class=nowrap>编剧:</td><td valign=top colspan=2>" + _get(m, 'Writer') + "</td>";
+        html += "<tr><td valign=top class=nowrap>主演:</td><td valign=top colspan=2>" + _get(m, 'Actors') + "</td>";
+        html += "<tr><td valign=top class=nowrap>剧情简介:</td><td valign=top colspan=2>" + _get(m, 'Plot') + "</td>";
+        html += "<tr><td valign=top class=nowrap>投票/得分(IMDB):</td><td valign=top colspan=2>" + _getVotesRating(m, 'imdb') + "</td>";
+        html += "<tr><td valign=top class=nowrap>投票/得分(豆瓣):</td><td valign=top colspan=2>" + _getVotesRating(m, 'douban') + "</td>";
     }
     if (m.content && m.content.files && m.content.files.length > 0) {
-        html += '<tr><td valign=top><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">Size:</a></td>' 
+        html += '<tr><td valign=top class=nowrap><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">文件大小:</a></td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
+            + '<td align=right class=nowrap><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
         html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
     } else {
-        html += '<tr><td valign=top>Size:</td>' 
+        html += '<tr><td valign=top class=nowrap>文件大小:</td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
-            + '<td align=right style="white-space: nowrap"><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
+            + '<td align=right class=nowrap><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
     }
     html += "</table>"
     return html;
@@ -84,6 +117,9 @@ var movie_user = $.cookie('movie_user');
 function perform_login() {
     var user = movie_user;
     $('#login_link').css('display', 'none');
+    var myMoviesLink = $('#my_movies_link');
+    myMoviesLink.attr('href', myMoviesLink.attr('href') + user);
+    myMoviesLink.css('display', '');
     set_welcome_msg(user);
     set_movie_marks();
     show_all_marks();
@@ -185,11 +221,6 @@ function _getTotalSize(content) {
     return 'N/A';
 }
 
-function _get(str) {
-    if (str && typeof str === 'string' && str.length > 0) return str;
-    return 'N/A';
-}
-
 function auto_reload() {
     reload_movies(list_type);
     setTimeout(auto_reload, 3600000);
@@ -199,7 +230,12 @@ function auto_reload() {
 
 <body onload="javascript:auto_reload();">
     <h1>{{ title }}</h1>
-    <a id="login_link" href="" onclick="login()">Login</a><span id='movie_user' style='display: none'></span>
+    <table width="100%">
+        <tr>
+            <td align=left width="50%"><a id="login_link" href="" onclick="login()">Login</a><span id='movie_user' style='display: none'></span></td>
+            <td align=right width="50%"><a id="my_movies_link" href="/user_movies?user=" style="display: none" target="_my_movies">My Movies</a></td>
+        </tr>
+    </table>
     <table id="movie_list_table" border=1 width=100%></table>
 </body>
 </html>
