@@ -15,6 +15,21 @@
                     movies.css('display', 'none');
                 }
             }
+
+            function remove(user, hash) {
+                var url = '/json/mark_movie?user=' + user;
+                url += '&hash=' + hash;
+                url += '&mark=false';
+                $.getJSON(url, function(reply) {
+                    if (reply && reply.success 
+                        && (reply.success == 'true' || reply.success == true)) {
+                        $('#movie_' + user + '_' + hash).remove();
+                        if ($('#movies_' + user + ' > li').length == 0) {
+                            $('#movies_' + user).remove();
+                        }
+                    }
+                });
+            }
         </script>
     </head>
 
@@ -22,10 +37,11 @@
     <h1>All User Movies</h1>
     <dl>
         {% for movies in allUserMovies %}
-        <dt><span id="mark_{{ loop.key }}">+</span>&nbsp;<a href="javascript:void(0)" onclick="toggle_user_movies('{{ loop.key  }}')">{{ loop.key }}</a></dt>
-        <ul id="movies_{{ loop.key }}" style="display: none">
-            {% for movieName in {{ movies }} %}
-            <li>{{ movieName }}</li>
+        {% set user = loop.key %}
+        <dt><span id="mark_{{ user }}">+</span><a href="javascript:void(0)" onclick="toggle_user_movies('{{ user  }}')">{{ user }}</a></dt>
+        <ul id="movies_{{ user }}" style="display: none">
+            {% for movie in {{ movies }} %}
+            <li id="movie_{{ user }}_{{ movie['hash'] }}">{{ movie['filename'] }}&nbsp;<a href="javascript:void(0)" onclick="remove('{{ user }}', '{{ movie['hash'] }}')">remove</a></li>
             {% endfor %}
         </ul>
         {% endfor %}
