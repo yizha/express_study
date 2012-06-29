@@ -22,7 +22,7 @@
     <h1>All User Movies</h1>
     <dl>
         {% for movies in allUserMovies %}
-        <dt><span id="mark_{{ loop.key }}">+</span>&nbsp;<a href="#" onclick="toggle_user_movies('{{ loop.key  }}')">{{ loop.key }}</a></dt>
+        <dt><span id="mark_{{ loop.key }}">+</span>&nbsp;<a href="javascript:void(0)" onclick="toggle_user_movies('{{ loop.key  }}')">{{ loop.key }}</a></dt>
         <ul id="movies_{{ loop.key }}" style="display: none">
             {% for movieName in {{ movies }} %}
             <li>{{ movieName }}</li>

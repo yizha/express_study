@@ -60,6 +60,38 @@ function _get(m, attr) {
     }
 }
 
+function _getTitle(m) {
+    var imdb = m.imdb;
+    var douban = m.douban;
+    var title = imdb['Title'];
+    if (douban && typeof douban['Title'] === 'string' && douban['Title'].length > 0) {
+        title += '/' + douban['Title'];
+    }
+    return title;
+}
+
+function _getPlot(m) {
+    var plot = _get(m, 'Plot');
+    var part = plot.substring(0, 160);
+    if (part == plot) return plot;
+    part = '<span id="short_plot_' + m.hash + '">' 
+        + part + '...<a href="javascript:void(0)" onclick="_toggle_plot(\'' + m.hash + '\')">全部</a></span>';
+    full = '<span id="full_plot_' + m.hash + '" style="display: none">' 
+        + plot + '&nbsp;&nbsp;<a href="javascript:void(0)" onclick="_toggle_plot(\'' + m.hash + '\')">部分</a></span>';
+    return part + full;
+}
+
+function _toggle_plot(hash) {
+    var part = $('#short_plot_' + hash);
+    if (part.css('display') == 'none') {
+        part.css('display', '');
+        $('#full_plot_' + hash).css('display', 'none');
+    } else {
+        part.css('display', 'none');
+        $('#full_plot_' + hash).css('display', '');
+    }
+}
+
 function _getVotesRating(m, type) {
     var data = m[type];
     if (data && typeof data === 'object') {
@@ -87,19 +119,19 @@ function to_info_table(m) {
     // imdb data
     var imdb = m.imdb;
     if (imdb) {
-        html += "<tr><td valign=top class=nowrap>片名:</td><td valign=top colspan=2>" + _get(m, 'Title') + _getLinkHtml(m) + "</td>";
+        html += "<tr><td valign=top class=nowrap>片名:</td><td valign=top colspan=2>" + _getTitle(m) + _getLinkHtml(m) + "</td>";
         html += "<tr><td valign=top class=nowrap>发布日期:</td><td valign=top colspan=2>" + _get(m, 'Released') + "</td>";
         html += "<tr><td valign=top class=nowrap>时长:</td><td valign=top colspan=2>" + _get(m, 'Runtime') + "</td>";
         html += "<tr><td valign=top class=nowrap>类型:</td><td valign=top colspan=2>" + _get(m, 'Genre') + "</td>";
         html += "<tr><td valign=top class=nowrap>导演:</td><td valign=top colspan=2>" + _get(m, 'Director') + "</td>";
         html += "<tr><td valign=top class=nowrap>编剧:</td><td valign=top colspan=2>" + _get(m, 'Writer') + "</td>";
         html += "<tr><td valign=top class=nowrap>主演:</td><td valign=top colspan=2>" + _get(m, 'Actors') + "</td>";
-        html += "<tr><td valign=top class=nowrap>剧情简介:</td><td valign=top colspan=2>" + _get(m, 'Plot') + "</td>";
+        html += "<tr><td valign=top class=nowrap>剧情简介:</td><td valign=top colspan=2>" + _getPlot(m) + "</td>";
         html += "<tr><td valign=top class=nowrap>投票/得分(IMDB):</td><td valign=top colspan=2>" + _getVotesRating(m, 'imdb') + "</td>";
         html += "<tr><td valign=top class=nowrap>投票/得分(豆瓣):</td><td valign=top colspan=2>" + _getVotesRating(m, 'douban') + "</td>";
     }
     if (m.content && m.content.files && m.content.files.length > 0) {
-        html += '<tr><td valign=top class=nowrap><a href="javascript:toggle_files(\'' + m.hash + '_files' + '\')">文件大小:</a></td>' 
+        html += '<tr><td valign=top class=nowrap><a href="javascript:void(0)" onclick="toggle_files(\'' + m.hash + '_files' + '\')">文件大小:</a></td>' 
             + '<td valign=top width=100%>' + _getTotalSize(m.content) + '</td>'
             + '<td align=right class=nowrap><span style="display: none" name=mark_container><input type=checkbox id=mark_' + m.hash + ' onclick="mark(\'' + m.hash + '\')"><label for=mark_' + m.hash + '>mark</label></span></td></tr>';
         html += "<tr id='" + m.hash + '_files' + "' style='display:none'><td></td><td>" + files_to_html(m.content.files) + "</td></tr>";
@@ -117,7 +149,7 @@ var movie_user = $.cookie('movie_user');
 function perform_login() {
     var user = movie_user;
     $('#login_link').css('display', 'none');
-    var myMoviesLink = $('#my_movies_link');
+    var myMoviesLink = $('#my_marks_link');
     myMoviesLink.attr('href', myMoviesLink.attr('href') + user);
     myMoviesLink.css('display', '');
     set_welcome_msg(user);
@@ -233,7 +265,7 @@ function auto_reload() {
     <table width="100%">
         <tr>
             <td align=left width="50%"><a id="login_link" href="" onclick="login()">Login</a><span id='movie_user' style='display: none'></span></td>
-            <td align=right width="50%"><a id="my_movies_link" href="/user_movies?user=" style="display: none" target="_my_movies">My Movies</a></td>
+            <td align=right width="50%"><a id="my_marks_link" href="/user_movies?user=" style="display: none" target="_my_movies">My Marks</a></td>
         </tr>
     </table>
     <table id="movie_list_table" border=1 width=100%></table>
