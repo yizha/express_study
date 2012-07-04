@@ -1,6 +1,11 @@
 var manager = require("movie_manager");
 var path = require('path');
 
+// keepalive
+exports.keepalive = function(req, res) {
+    res.render('keepalive.html', {});
+}
+
 // home page
 exports.index = function(req, res) {
     var type = req.param('type', 'available');

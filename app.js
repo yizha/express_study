@@ -1,6 +1,6 @@
 var manager = require('movie_manager');
 
-var movie_dir = ['/tmp/dingyc'];
+var movie_dir = ['/home/media/movies'];
 
 manager.connect(null, null, null);
 manager.loadMovieFromDir(movie_dir);
@@ -48,6 +48,8 @@ function adminAuth(user, pass) {
 }
 
 // Routes
+app.get('/keepalive', routes.keepalive);
+
 //app.get('/', express.basicAuth(userAuth));
 app.get('/admin*', express.basicAuth(adminAuth));
 
@@ -71,7 +73,7 @@ app.get('/admin/removeIMDB', routes.removeIMDB);
 app.get('/admin/loadFilesAndSize', routes.loadFilesAndSize);
 app.get('/admin/recommend', routes.recommendMovie);
 
-app.listen(3000, function(){
+app.listen(80, function(){
     console.log(process.cwd());
     console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
